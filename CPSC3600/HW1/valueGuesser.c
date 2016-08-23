@@ -1,0 +1,247 @@
+/**
+ *Author: Tim McVicker
+ *Date: 30JAN2016
+ *This program takes as command line arguments the IP of a server and the port 
+ *it is running on, as well as a backup port.  It then sends the server integer 
+ *guesses that are input by the user, attempting to guess a random number
+ *from the server.
+ *Functions defined here are:
+ *Main()
+ *terminate_client()
+ *CatchAlarm()
+ *timeval_subtract()
+ */
+
+#include "headers.h"
+
+//these variables are global to be used in terminate function
+//represents the socket, the guess and the reply from the server
+int client_sock, guessVal, returnVal;
+
+//represents the starting time
+struct timeval oldTime;  
+
+int numAttempts=0;
+
+//address info of server
+struct addrinfo * saddr_in;
+
+
+int main(int argc, char *argv[])
+{
+  //connection ports
+  char * port;
+  char* backup_port;
+
+  //to set up address format
+  struct addrinfo hints;
+
+  //server IP
+  char* servIP;
+
+  //to handle the SIGALRM
+  struct sigaction MyAction;
+
+  //set up starting time
+  gettimeofday(&oldTime, NULL);
+
+  //handles SIGINT
+  signal(SIGINT, terminate_client);
+
+  //check for right arguments
+  if(argc < 6 || argc > 7)
+    {
+      printf("Usage : %s -s <ServerIP> -pl <serverPort1> -p2 <serverPort2>\n", 
+	     argv[0]);
+      exit(1);
+    }
+
+  //read in arguments
+  servIP = argv[2];
+  port = argv[4];
+  backup_port = argv[6];
+
+  //set uo address format
+  memset(&hints, 0, sizeof(hints));
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype = SOCK_DGRAM;
+  hints.ai_protocol = IPPROTO_UDP;
+
+  //get address info of server
+  int check = getaddrinfo(servIP, port, &hints, &saddr_in);
+  if(check != 0)
+    {
+      //if the first port failed check the second
+      check = 1;
+      check = getaddrinfo(servIP, backup_port, &hints, &saddr_in);
+
+      if(check != 0)
+	{
+	  perror("getaddrinfo");
+	  exit(1);
+	}
+    }
+  
+  //set up socket
+  if((client_sock = socket(saddr_in->ai_family, saddr_in->ai_socktype,
+			   saddr_in->ai_protocol)) < 0)
+    {
+      perror("socket");
+      exit(1);
+    }
+
+  //set up alarm handler
+  MyAction.sa_handler = CatchAlarm;
+  MyAction.sa_flags = 0;
+
+  if(sigaction(SIGALRM, &MyAction, 0) < 0)
+    {
+      perror("sigaction()");
+      exit(1);
+    }  
+
+  //begin guessing
+  returnVal = -1;
+  while(returnVal != 0)
+    {
+      //user inputs guess
+      printf("Please enter a number: ");
+      if( (scanf("%i", &guessVal)) < 0)
+	{
+	  perror("scanf");
+	  exit(1);
+	}
+      
+
+      //sends guess to server
+      if(sendto(client_sock, &guessVal, sizeof(int), 0, saddr_in->ai_addr,
+		saddr_in->ai_addrlen) < 0)
+	{
+	  perror("sendto");
+	  exit(1);
+	}
+
+      numAttempts++;
+
+      //for use receiving reply
+      struct sockaddr_storage fromAddr;
+      socklen_t fromSize = sizeof(fromAddr);
+
+      //set TIMEOUT to 1 sec
+      alarm(1);
+
+      //wait for reply, keeping trying until response
+      while((recvfrom(client_sock, &returnVal, sizeof(int), 0,
+		      (struct sockaddr*) &fromAddr, &fromSize)) < 0)
+	{
+	  //if timeout try again
+	  if(errno == EINTR)
+	    {
+	      printf("Timeout, please try again:\n");
+	      printf("Please enter a number: ");
+	      if( (scanf("%i", &guessVal)) < 0)
+		{
+		  perror("scanf");
+		  exit(1);
+		}
+	      if(sendto(client_sock, &guessVal, sizeof(int), 0, 
+			saddr_in->ai_addr, saddr_in->ai_addrlen) < 0)
+		{
+		  perror("sendto");
+		  exit(1);
+		}
+	      alarm(1);
+	    }
+	  else
+	    {
+	      perror("recvfrom");
+	      exit(1);
+	    }
+	}
+      //if we get here we received a reply
+      //turn off timeout
+      alarm(0);
+
+      //figure out where our guess was
+      if(returnVal == 1)
+	printf("Guess is too high\n");
+      if(returnVal == 2)
+	printf("Guess is too low\n");
+
+      //guess is right
+      if(returnVal == 0)
+	break;
+     
+    }
+
+  //we get here if the guess is right
+  terminate_client();
+ 
+  return 0;
+}
+
+/**
+ *This function handles the alarm signal, which is used to signal a TIMEOUT 
+ *from the server.  It does absolutely nothing.
+ */
+void CatchAlarm(int ignored)
+{
+  return;
+}
+
+/**
+ *This function handles the ending of the client program.  It is called
+ *both on SIGINT and a correct guess.  It first frees the server info and closes
+ *the socket, and then calculates the elapsed time.  It then prints the number
+ *of attempts, the time elapsed, and the last guessed number. It then exits
+ *the program
+ */
+void terminate_client()
+{
+  freeaddrinfo(saddr_in);
+  close(client_sock);
+  struct timeval  newTime , changeTime;
+  gettimeofday(&newTime, NULL);
+
+  if( timeval_subtract(&changeTime, &newTime, &oldTime) == 1)
+    timeval_subtract(&changeTime, &oldTime, &newTime);
+
+
+  printf("\n%i\t", numAttempts);
+  printf("%ld.%06ld\t", changeTime.tv_sec, changeTime.tv_usec);
+  printf("%i\n", guessVal); 
+  exit(0);
+}
+
+/**
+ *This function is used to calculate the elapsed time.  It takes as arguments
+ *both the starting time and ending time, as well as the struct for the elapsed
+ *time. It then subtracts the two and returns a 1 if the number is negative,
+ *which means that we must switch the two arguments.  This function was found on
+ *StackOverFlow
+ */
+int timeval_subtract (struct timeval *result, struct timeval *x,struct timeval  *y)  
+{  
+  /* Perform the carry for the later subtraction by updating y. */  
+  if (x->tv_usec < y->tv_usec) {  
+    int nsec = (y->tv_usec - x->tv_usec) / 1000000 + 1;  
+    y->tv_usec -= 1000000 * nsec;  
+    y->tv_sec += nsec;  
+  }  
+  if (x->tv_usec - y->tv_usec > 1000000) {  
+    int nsec = (y->tv_usec - x->tv_usec) / 1000000;  
+    y->tv_usec += 1000000 * nsec;  
+    y->tv_sec -= nsec;  
+  }  
+
+  /* Compute the time remaining to wait.
+     tv_usec is certainly positive. */  
+  result->tv_sec = x->tv_sec - y->tv_sec;  
+  result->tv_usec = x->tv_usec - y->tv_usec;  
+
+  /* Return 1 if result is negative. */  
+  return x->tv_sec < y->tv_sec;  
+}
+
+
+

@@ -1,0 +1,7 @@
+add r3,r1,r2  IF ID EX DM WB
+add r4,r1,r2     IF ID EX DM WB
+add r5,r1,r3        IF    ID EX DM WB
+add r6,r1,r5              IF       ID EX DM WB
+lw  r7,0(r1)                       IF ID EX DM WB
+add r9,r7,r8                          IF       ID EX DM WB
+sw  r9,0(r1)                                   IF       ID EX DM WB

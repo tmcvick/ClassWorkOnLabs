@@ -1,0 +1,7 @@
+add ra,rb,r2
+add r4,rb,r2
+add rc,ra,r3
+add r6,r1,rc
+lw  r7,0(rb)
+add r9,r7,r8
+sw  r9,0(r1)

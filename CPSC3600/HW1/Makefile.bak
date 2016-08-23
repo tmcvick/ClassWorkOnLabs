@@ -1,0 +1,90 @@
+depend:
+	makedepend -- valueServer.c valueGuesser.c
+
+all: valueServer valueGuesser
+
+valueServer: valueServer.o
+	gcc -Wall valueServer.o -o valueServer
+
+valueGuesser: valueGuesser.o
+	gcc -Wall valueGuesser.o -o valueGuesser
+
+.c.o:
+	gcc -c $*.c
+
+clean:
+	 rm valueGuesser valueServer *o
+# DO NOT DELETE
+
+valueServer.o: /usr/include/stdio.h /usr/include/features.h
+valueServer.o: /usr/include/stdc-predef.h /usr/include/sys/cdefs.h
+valueServer.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
+valueServer.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
+valueServer.o: /usr/include/libio.h /usr/include/_G_config.h
+valueServer.o: /usr/include/wchar.h /usr/include/bits/stdio_lim.h
+valueServer.o: /usr/include/bits/sys_errlist.h /usr/include/stdlib.h
+valueServer.o: /usr/include/sys/types.h /usr/include/time.h
+valueServer.o: /usr/include/endian.h /usr/include/bits/endian.h
+valueServer.o: /usr/include/bits/byteswap.h /usr/include/bits/byteswap-16.h
+valueServer.o: /usr/include/sys/select.h /usr/include/bits/select.h
+valueServer.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+valueServer.o: /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h
+valueServer.o: /usr/include/alloca.h /usr/include/bits/stdlib-float.h
+valueServer.o: /usr/include/string.h /usr/include/unistd.h
+valueServer.o: /usr/include/bits/posix_opt.h /usr/include/bits/environments.h
+valueServer.o: /usr/include/bits/confname.h /usr/include/getopt.h
+valueServer.o: /usr/include/errno.h /usr/include/bits/errno.h
+valueServer.o: /usr/include/linux/errno.h /usr/include/asm/errno.h
+valueServer.o: /usr/include/asm-generic/errno.h
+valueServer.o: /usr/include/asm-generic/errno-base.h
+valueServer.o: /usr/include/netinet/in.h /usr/include/stdint.h
+valueServer.o: /usr/include/bits/wchar.h /usr/include/sys/socket.h
+valueServer.o: /usr/include/sys/uio.h /usr/include/bits/uio.h
+valueServer.o: /usr/include/bits/socket.h /usr/include/bits/socket_type.h
+valueServer.o: /usr/include/bits/sockaddr.h /usr/include/asm/socket.h
+valueServer.o: /usr/include/asm-generic/socket.h /usr/include/asm/sockios.h
+valueServer.o: /usr/include/asm-generic/sockios.h /usr/include/bits/in.h
+valueServer.o: /usr/include/arpa/inet.h /usr/include/netdb.h
+valueServer.o: /usr/include/rpc/netdb.h /usr/include/bits/netdb.h
+valueServer.o: /usr/include/pthread.h /usr/include/sched.h
+valueServer.o: /usr/include/bits/sched.h /usr/include/bits/setjmp.h
+valueServer.o: /usr/include/signal.h /usr/include/bits/signum.h
+valueServer.o: /usr/include/bits/siginfo.h /usr/include/bits/sigaction.h
+valueServer.o: /usr/include/bits/sigcontext.h /usr/include/bits/sigstack.h
+valueServer.o: /usr/include/bits/sigthread.h
+valueGuesser.o: /usr/include/stdio.h /usr/include/features.h
+valueGuesser.o: /usr/include/stdc-predef.h /usr/include/sys/cdefs.h
+valueGuesser.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
+valueGuesser.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
+valueGuesser.o: /usr/include/libio.h /usr/include/_G_config.h
+valueGuesser.o: /usr/include/wchar.h /usr/include/bits/stdio_lim.h
+valueGuesser.o: /usr/include/bits/sys_errlist.h /usr/include/stdlib.h
+valueGuesser.o: /usr/include/sys/types.h /usr/include/time.h
+valueGuesser.o: /usr/include/endian.h /usr/include/bits/endian.h
+valueGuesser.o: /usr/include/bits/byteswap.h /usr/include/bits/byteswap-16.h
+valueGuesser.o: /usr/include/sys/select.h /usr/include/bits/select.h
+valueGuesser.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+valueGuesser.o: /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h
+valueGuesser.o: /usr/include/alloca.h /usr/include/bits/stdlib-float.h
+valueGuesser.o: /usr/include/string.h /usr/include/unistd.h
+valueGuesser.o: /usr/include/bits/posix_opt.h
+valueGuesser.o: /usr/include/bits/environments.h /usr/include/bits/confname.h
+valueGuesser.o: /usr/include/getopt.h /usr/include/errno.h
+valueGuesser.o: /usr/include/bits/errno.h /usr/include/linux/errno.h
+valueGuesser.o: /usr/include/asm/errno.h /usr/include/asm-generic/errno.h
+valueGuesser.o: /usr/include/asm-generic/errno-base.h
+valueGuesser.o: /usr/include/netinet/in.h /usr/include/stdint.h
+valueGuesser.o: /usr/include/bits/wchar.h /usr/include/sys/socket.h
+valueGuesser.o: /usr/include/sys/uio.h /usr/include/bits/uio.h
+valueGuesser.o: /usr/include/bits/socket.h /usr/include/bits/socket_type.h
+valueGuesser.o: /usr/include/bits/sockaddr.h /usr/include/asm/socket.h
+valueGuesser.o: /usr/include/asm-generic/socket.h /usr/include/asm/sockios.h
+valueGuesser.o: /usr/include/asm-generic/sockios.h /usr/include/bits/in.h
+valueGuesser.o: /usr/include/arpa/inet.h /usr/include/netdb.h
+valueGuesser.o: /usr/include/rpc/netdb.h /usr/include/bits/netdb.h
+valueGuesser.o: /usr/include/signal.h /usr/include/bits/signum.h
+valueGuesser.o: /usr/include/bits/siginfo.h /usr/include/bits/sigaction.h
+valueGuesser.o: /usr/include/bits/sigcontext.h /usr/include/bits/sigstack.h
+valueGuesser.o: /usr/include/bits/sigthread.h /usr/include/pthread.h
+valueGuesser.o: /usr/include/sched.h /usr/include/bits/sched.h
+valueGuesser.o: /usr/include/bits/setjmp.h /usr/include/sys/time.h
